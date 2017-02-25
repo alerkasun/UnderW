@@ -1,0 +1,48 @@
+<% content_for :head do %>
+  <script type="text/javascript">
+    $(document).on('page:load ready',function(){init_location_history_map();} );
+  </script>
+<% end %>
+
+<div class="row">
+    <div class="col-md-9">
+        <div id="map"></div>
+    </div>
+    <div class="col-md-3">
+        <h3>Filter</h3>
+        <div id="sidebar-filter">
+            <%= form_for(:filter, url: "#", html: { id: "form-filter", class: "form form-horizontal widget", role: "form" }) do |f| %>
+              <div class="form-group">
+                  <%= f.label "Device:", class: "control-label" %>
+                  <%= f.select :device_id, options_from_collection_for_select(@devices, "id", "name"), class: 'form-control', :prompt => "Select a device" %>
+
+              </div>
+              <div class="form-group">
+                  <%= f.label "Date From:", class: "control-label" %>
+                  <%= f.text_field :date_from, class: "form-control filter-date", value: Time.now.strftime("%Y-%m-%d") %>
+              </div>
+              <div class="form-group">
+                  <%= f.label "Date To:", class: "control-label" %>
+                  <%= f.text_field :date_to, class: "form-control filter-date" %>
+              </div>
+              <div class="form-group">
+                  <%= f.label "Accuracy better than (meters):", class: "control-label" %>
+                  <%= f.text_field :accuracy_better_than, class: "form-control", type: "number", value: "200" %>
+              </div>
+              <div class="form-group">
+                  <%= f.label "Limit:", class: "control-label" %>
+                  <%= f.text_field :limit, class: "form-control", type: "number", value: "30" %>
+                  <%= f.radio_button :sort, "desc", checked: true %>
+                  <%= f.label "Newest first", class: "control-label" %>
+                  <%= f.radio_button :sort, "asc" %>
+                  <%= f.label "Oldest first", class: "control-label" %>
+              </div>
+              <div class="form-group">
+                  <%= button_tag "Refresh", type: "button", class: "btn btn-primary", onclick: "javascript:update_locations_for_device()" %>
+              </div>
+
+            <% end %>
+        </div>
+    </div>
+</div>
+

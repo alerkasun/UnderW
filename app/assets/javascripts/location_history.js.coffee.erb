@@ -1,0 +1,20 @@
+<% url = ThreeHeadedMonkeyWeb::Application.routes.url_helpers %>
+
+window.init_location_history_map = ->
+  window.locmap = new LocationMap($("#map").get(0))
+  $(".filter-date").datepicker({ dateFormat: 'yy-mm-dd' })
+
+@update_locations_for_device = ->
+  locmap.clear()
+  device_id = $("#filter_device_id").val()
+  return if device_id.length == 0
+  location_path = "<%= CGI.unescape url.location_history_path('{device_id}') %>".replace("{device_id}", device_id);
+  $.ajax
+    url: location_path
+    data: $("#form-filter").serialize()
+    dataType: "json"
+    error: (jqXHR, textStatus, errorThrown) ->
+      alert("Error: " + textStatus)
+    success: (data, textStatus, jqXHR) ->
+      locmap.addLocations(data)
+      locmap.moveMapToLocations()

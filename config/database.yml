@@ -1,0 +1,20 @@
+test: &default
+  adapter: postgresql
+  encoding: unicode
+  database: monkey_test
+  pool: 5
+  host: localhost
+  user:
+  password:
+
+production:
+  <<: *default
+  database: monkey_production
+
+staging:
+  <<: *default
+  database: monkey_staging
+
+development:
+  <<: *default
+  database: monkey_development

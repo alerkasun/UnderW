@@ -1,0 +1,60 @@
+<% url_helper = ThreeHeadedMonkeyWeb::Application.routes.url_helpers %>
+
+@periodically_refresh_dashboard = ->
+  device_id = $("#device_id").val()
+  data = {}
+  data.last_message = window.last_added_message_time if window.last_added_message_time?
+  $.ajax
+    dataType: "json"
+    data: data
+    error: (jqXHR, textStatus, errorThrown) ->
+      alert("Error: " + textStatus)
+    success: (data, textStatus, jqXHR) ->
+      if data.last_location?
+        unless locmap.getLastLocation()? && locmap.getLastLocation()["time"] == data.last_location["time"]
+          locmap.clear()
+          locmap.addLocations([data.last_location])
+          locmap.moveMapToLocations()
+      add_messages(data.messages) if data.messages?
+    complete: ->
+      setTimeout(periodically_refresh_dashboard, 5000)
+
+@init_device_dashboard = ->
+  $("select#device_id").on "change", ->
+    new_url =  "<%= CGI.unescape url_helper.device_dashboard_path('{device_id}') %>".replace("{device_id}", this.value);
+    if Turbolinks?
+      Turbolinks.visit new_url
+    else
+      window.location.href = new_url
+  window.locmap = new LocationMap($("#map").get(0))
+  load_commands()
+  periodically_refresh_dashboard()
+  $("button#run_command").click run_command
+
+@load_commands = ->
+  select = $("select#command_select")
+  select.val([])
+  console.log JSON.stringify(available_commands)
+  for c in available_commands
+    select.append(new Option(c.name, c.value))
+
+@run_command = ->
+  url =  "<%= CGI.unescape url_helper.device_pendingcommands_path('{device_id}') %>".replace("{device_id}",  $("select#device_id").val());
+  command_str = $("select#command_select").val()
+  $.ajax
+    url: url
+#    dataType: "json"
+    contentType: 'application/json'
+    type: "POST"
+    data: JSON.stringify {pendingcommand: {command: command_str}}
+    error: (jqXHR, textStatus, errorThrown) ->
+      alert("Error: " + textStatus)
+    success: (data, textStatus, jqXHR) ->
+      add_messages([{text_html: "<p>Sent Command: " + command_str + "</p>"}])
+
+@add_messages = (messages) ->
+  container = $("#message_container")
+  for message in messages
+    window.last_added_message_time = message.created_at if message.created_at?
+    container.append("<div>#{message.text_html}</div>")
+  container.animate({ scrollTop: container.prop("scrollHeight")}, 3000);

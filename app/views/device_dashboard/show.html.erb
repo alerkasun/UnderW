@@ -1,0 +1,23 @@
+<% content_for :head do %>
+    <script type="text/javascript">
+        $(document).on('page:load ready',function(){init_device_dashboard();} );
+    </script>
+<% end %>
+
+<div class="row">
+    <div class="col-md-9">
+        Choose Device: <%= select_tag :device_id, options_from_collection_for_select(@devices, "id", "name", @device.id) %> <br />
+        Choose Command: <%= select_tag :command_select %> <%= button_tag "Run", id: "run_command", type: "button", class: "btn btn-primary" %>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-9">
+        <div id="map"></div>
+    </div>
+    <div class="col-md-3">
+        <div id="message_container">
+            <h3>Messages</h3>
+        </div>
+    </div>
+</div>

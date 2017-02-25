@@ -1,0 +1,17 @@
+registration:
+  invite_only: false
+
+host_config:
+  base_url: localhost
+  ssl_port: 3000
+
+mail_config:
+  from_user: noreply
+  from_domain: localhost
+  
+view_config:
+  qrcode_size: 350
+
+gcm_config:
+  project_number:
+  api_key:

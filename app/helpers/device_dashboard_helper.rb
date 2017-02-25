@@ -1,0 +1,2 @@
+module DeviceDashboardHelper
+end
